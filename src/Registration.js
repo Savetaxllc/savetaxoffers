@@ -130,9 +130,6 @@ export const RegistrationPage = () => {
   const calculateTotal = (subtotal) => {
         return subtotal ;
     };
-    console.log("Total amount:", total);
-    console.log("openZelleModal:", openZelleModal);
-    console.log("token",token)
   return (
     <Box
       sx={{
@@ -198,7 +195,7 @@ export const RegistrationPage = () => {
             )}
             {!userInfo && (
               <>
-                <Signup prebookEmail={email} onSuccess={handleAvailoffer} />
+                <Signup setUserInfo={setUserInfo} setToken={setToken} email={email} onSuccess={handleAvailoffer} />
               </>
             )}
           </Box>

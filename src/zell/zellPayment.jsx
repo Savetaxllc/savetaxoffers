@@ -100,6 +100,7 @@ export const ZellPayment = ({openZelleModal,total,style,setOpenZelleModal,user_i
                 // setTicketData((prevData) => ({ ...prevData, ticket_status: 'Payment Made' }));
                 alert('Payment was successfully processed.');
                 setOpenTransactionModal(false);
+                window.location.href = 'https://www.savetaxllc.com';
             }
             else{
               setLoading(false);
