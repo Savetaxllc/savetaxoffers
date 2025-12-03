@@ -92,10 +92,18 @@ export const RegistrationPage = () => {
 
         // Expecting backend JSON like: { exists: true } or { exists: false }
         if (data && data.success) {
-          setEmailStatus("available");
-          setUserInfo(data.message || null);
-          setToken(data.token || null);
-          setShow(true);
+            if(data.already_registered){
+            setEmailStatus("taken");
+            setUserInfo(null);
+            setShow(true);
+            return;
+          }
+          else{
+            setEmailStatus("available");
+            setUserInfo(data.message || null);
+            setToken(data.token || null);
+            setShow(true);
+          }
         } else {
           setEmailStatus("not_available");
           setUserInfo(null);
@@ -130,6 +138,20 @@ export const RegistrationPage = () => {
   const calculateTotal = (subtotal) => {
         return subtotal ;
     };
+    const helperText = (emailStatus) => {
+        switch (emailStatus) {
+            case "checking":
+                return "Checking...";
+            case "available":
+                return "Email is available";
+            case "not_available":
+                return "Email not registered. Please sign up to avail the offer.";
+            case "error":
+                return "Enter a valid email or try again later";
+            default:
+                return "";
+        }
+    };
   return (
     <Box
       sx={{
@@ -149,57 +171,76 @@ export const RegistrationPage = () => {
             <TextField
               variant="outlined"
               placeholder="Enter your email"
-              sx={{ mt: 2, mb: 4 }}
+              sx={{
+                mt: 2,
+                mb: 4,
+                "& .MuiInputBase-input": {
+                  fontSize: 20, // Change 20 to your desired font size
+                },
+              }}
               value={email}
               onChange={handleEmailChange}
-              helperText={
-                emailStatus === "checking"
-                  ? "Checking..."
-                  : emailStatus === "available"
-                  ? "Email is available"
-                  : emailStatus === "taken"
-                  ? "Email already registered"
-                  : emailStatus === "not_available"
-                  ? "Email not registered. Please sign up to avail the offer."
-                  : emailStatus === "error"
-                  ? "Enter a valid email or try again later"
-                  : ""
-              }
+              helperText={helperText(emailStatus)}
               error={emailStatus === "taken" || emailStatus === "error"}
             />
           </FormControl>
         </Box>
-        {show && (
-          <Box sx={{ mb: 2 }}>
-            {userInfo && (
-              <>
-                <Card sx={{ bgcolor: "#e0f7fa", p: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    Hello {userInfo.firstName} {userInfo.lastName}
-                  </Typography>
-                  <Typography variant="subtitle2">
-                    Please click on the link button to avail the offer
-                  </Typography>
-                </Card>
-                <Box textAlign="center" mt={4}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{ borderRadius: 2 }}
-                    onClick={handleZelleModal}
-                  >
-                    Pre-Book Now for $29.99
-                  </Button>
-                </Box>
-              </>
-            )}
-            {!userInfo && (
-              <>
-                <Signup setUserInfo={setUserInfo} setToken={setToken} email={email} onSuccess={handleAvailoffer} />
-              </>
-            )}
-          </Box>
-        )}
+        {show &&
+          (emailStatus === "taken" ? (
+            <Box>
+              <Card sx={{ bgcolor: "#ffebee", p: 2 }}>
+                <Typography variant="subtitle1" fontWeight={600} color="error">
+                  You have already registered for the offer. Multiple
+                  registrations are not allowed.
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ borderRadius: 2, mt: 2 }}
+                  onClick={() =>
+                    (window.location.href = "https://www.savetaxllc.com/login")
+                  }
+                >
+                  Go to Login
+                </Button>
+              </Card>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 2 }}>
+              {userInfo && (
+                <>
+                  <Card sx={{ bgcolor: "#e0f7fa", p: 2 }}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Hello {userInfo.firstName} {userInfo.lastName}
+                    </Typography>
+                    <Typography variant="subtitle2">
+                      Please click on the link button to avail the offer
+                    </Typography>
+                  </Card>
+                  <Box textAlign="center" mt={4}>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      sx={{ borderRadius: 2 }}
+                      onClick={handleZelleModal}
+                    >
+                      Pre-Book Now for $29.99
+                    </Button>
+                  </Box>
+                </>
+              )}
+              {!userInfo && (
+                <>
+                  <Signup
+                    setUserInfo={setUserInfo}
+                    setToken={setToken}
+                    email={email}
+                    onSuccess={handleAvailoffer}
+                  />
+                </>
+              )}
+            </Box>
+          ))}
       </Container>
       <ZellPayment
         openZelleModal={openZelleModal}
